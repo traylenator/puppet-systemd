@@ -31,15 +31,28 @@
 define systemd::daemon_reload (
   Boolean $enable = true,
   Optional[Integer[1]] $uid = undef,
+  Optional[String[1]] $user = undef,
 ) {
+
   if $enable {
+
     # For a `systemd --user` instance XDG_RUNTIME_DIR must be set so dbus
     # can be found.
 
-    if $uid {
-      $_title   = "${module_name}-${name}-systemctl-user-${uid}-daemon-reload"
-      $_user    = String($uid)  # exec seems unhappy with integers.
-      $_env     = "XDG_RUNTIME_DIR=/run/user/${uid}"
+    if $user or $uid {
+      if ! $uid {
+        $_title  = "${module_name}-${name}-systemctl-user-${user}-daemon-reload"
+        $_user   = $user
+        $_env    = Deferred('inline_template',['XDG_RUNTIME_DIR=/run/user/<%= "1000" %>'
+      } else if ! $user {
+        $_title = "${module_name}-${name}-systemctl-user-${uid}-daemon-reload"
+        $_user  = String($uid)  # exec seems unhappy with integers.
+        $_env   = "XDG_RUNTIME_DIR=/run/user/${uid}"
+      } else {
+        $_title  = "${module_name}-${name}-systemctl-user-${user}-daemon-reload"
+        $_user   = $user
+        $_env   = "XDG_RUNTIME_DIR=/run/user/${uid}"
+      }
       $_command = ['systemctl', '--user', 'daemon-reload']
     } else {
       $_title   = "${module_name}-${name}-systemctl-daemon-reload"

@@ -43,7 +43,7 @@ define systemd::daemon_reload (
       if ! $uid {
         $_title  = "${module_name}-${name}-systemctl-user-${user}-daemon-reload"
         $_user   = $user
-        $_env    = Deferred('inline_template',['XDG_RUNTIME_DIR=/run/user/<%= "1000" %>'])
+        $_env    = Deferred('inline_epp',['XDG_RUNTIME_DIR=/run/user/<%= $pwval["uid"]  %>', { 'pwval' => Deferred('getpwnam',[$user])}])
       } elsif ! $user {
         $_title = "${module_name}-${name}-systemctl-user-${uid}-daemon-reload"
         $_user  = String($uid)  # exec seems unhappy with integers.

@@ -42,6 +42,17 @@ describe 'systemd with manage_networkd true' do
   context 'configure systemd stopped' do
     let(:manifest) do
       <<~PUPPET
+        # Stop networkd triggering sockets first so can
+        # reach a stable state.
+        if Integer($facts['systemd_version']) >= 260 {
+          service{ [
+            'systemd-networkd-varlink.socket',
+            'systemd-networkd-varlink-metrics.socket',
+            'systemd-networkd-resolve-hook.socket' ]:
+            ensure => 'stopped',
+          }
+        }
+
         class { 'systemd':
           manage_networkd => true,
           networkd_ensure => 'stopped',

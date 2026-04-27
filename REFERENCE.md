@@ -523,7 +523,7 @@ Default value: `false`
 
 Data type: `Enum['stopped','running']`
 
-The state that the ``networkd`` service should be in
+The state that the ``networkd`` service should be in. **Warning** Since since v260 of systemd ensuring the service is stopped may only be transient, it is very likely some socket will activate the service nearly immediatly.
 
 Default value: `'running'`
 

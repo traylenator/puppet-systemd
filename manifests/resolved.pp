@@ -202,7 +202,7 @@ class systemd::resolved (
     # Debian 13 started disabling mDNS by default, so we need to override that
     # if we want to manage mDNS. See https://bugs.debian.org/1098914 and
     # https://salsa.debian.org/systemd-team/systemd/-/commit/46432631232015b78071f84e5a3fb944621c83f7
-    if stdlib::os_version_gte('Debian', '13') {
+    if stdlib::os_version_gte('Debian', '13') or stdlib::os_version_gte('Ubuntu', '26') {
       file { '/etc/systemd/resolved.conf.d':
         ensure => directory,
         owner  => 'root',

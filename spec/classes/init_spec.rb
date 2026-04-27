@@ -266,7 +266,8 @@ describe 'systemd' do
             )
           end
 
-          context 'on Debian 13 or newer', if: facts[:os]['name'] == 'Debian' && facts[:os]['release']['major'].to_i >= 13 do
+          case [facts[:os]['name'], facts[:os]['release']['major']]
+          when %w[Debian 13], ['Ubuntu', '26.04'] # switch to family case once old debian, ubuntu gone
             it do
               is_expected.to contain_file('/etc/systemd/resolved.conf.d').with(
                 ensure: 'directory',
@@ -274,13 +275,15 @@ describe 'systemd' do
                 group: 'root',
                 mode: '0755',
               )
-            end
-
-            it do
               is_expected.to contain_file('/etc/systemd/resolved.conf.d/00-disable-mdns.conf').with(
                 ensure: 'link',
                 target: '/dev/null',
               ).that_notifies('Service[systemd-resolved]')
+            end
+          else
+            it do
+              is_expected.not_to contain_file('/etc/systemd/resolved.conf.d')
+              is_expected.not_to contain_file('/etc/systemd/resolved.conf.d/00-disable-mdns.conf')
             end
           end
         end

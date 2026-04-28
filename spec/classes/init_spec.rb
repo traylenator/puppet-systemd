@@ -8,23 +8,25 @@ describe 'systemd' do
       context "on #{os}" do
         let(:facts) { facts }
 
-        it { is_expected.to compile.with_all_deps }
-        it { is_expected.to create_class('systemd') }
-        it { is_expected.to contain_class('systemd::journald') }
-        it { is_expected.to contain_service('systemd-journald') }
-        it { is_expected.to have_ini_setting_resource_count(0) }
-        it { is_expected.not_to contain_class('systemd::machine_info') }
-        it { is_expected.not_to contain_service('systemd-resolved') }
-        it { is_expected.not_to contain_service('systemd-networkd') }
-        it { is_expected.not_to contain_service('systemd-timesyncd') }
-        it { is_expected.not_to contain_package('systemd-networkd') }
-        it { is_expected.not_to contain_package('systemd-timesyncd') }
-        it { is_expected.not_to contain_package('systemd-resolved') }
-        it { is_expected.not_to contain_package('systemd-container') }
-        it { is_expected.not_to contain_package('util-linux') }
-        it { is_expected.not_to contain_class('systemd::coredump') }
-        it { is_expected.not_to contain_class('systemd::oomd') }
-        it { is_expected.not_to contain_exec('systemctl set-default multi-user.target') }
+        it {
+          is_expected.to compile.with_all_deps
+          is_expected.to create_class('systemd')
+          is_expected.to contain_class('systemd::journald')
+          is_expected.to contain_service('systemd-journald')
+          is_expected.to have_ini_setting_resource_count(0)
+          is_expected.not_to contain_class('systemd::machine_info')
+          is_expected.not_to contain_service('systemd-resolved')
+          is_expected.not_to contain_service('systemd-networkd')
+          is_expected.not_to contain_service('systemd-timesyncd')
+          is_expected.not_to contain_package('systemd-networkd')
+          is_expected.not_to contain_package('systemd-timesyncd')
+          is_expected.not_to contain_package('systemd-resolved')
+          is_expected.not_to contain_package('systemd-container')
+          is_expected.not_to contain_package('util-linux')
+          is_expected.not_to contain_class('systemd::coredump')
+          is_expected.not_to contain_class('systemd::oomd')
+          is_expected.not_to contain_exec('systemctl set-default multi-user.target')
+        }
 
         context 'when enabling resolved and networkd' do
           let(:params) do
@@ -34,14 +36,16 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.to contain_file('/etc/resolv.conf').with_ensure('symlink') }
-          it { is_expected.not_to contain_exec('restore_resolv.conf_if_possible') }
-          it { is_expected.to contain_service('systemd-networkd').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-networkd').with_enable(true) }
-          it { is_expected.not_to contain_file('/etc/systemd/network') }
-          it { is_expected.to contain_systemd__manage_dropin('synthesize_hostname.conf').with_ensure('absent') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+            is_expected.to contain_file('/etc/resolv.conf').with_ensure('symlink')
+            is_expected.not_to contain_exec('restore_resolv.conf_if_possible')
+            is_expected.to contain_service('systemd-networkd').with_ensure('running')
+            is_expected.to contain_service('systemd-networkd').with_enable(true)
+            is_expected.not_to contain_file('/etc/systemd/network')
+            is_expected.to contain_systemd__manage_dropin('synthesize_hostname.conf').with_ensure('absent')
+          }
 
           if facts[:os]['family'] == 'RedHat'
             it { is_expected.to contain_package('systemd-networkd') }
@@ -111,23 +115,29 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('stopped') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(false) }
-          it { is_expected.not_to contain_file('/etc/resolv.conf') }
-          it { is_expected.to contain_exec('restore_resolv.conf_if_possible') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('stopped')
+            is_expected.to contain_service('systemd-resolved').with_enable(false)
+            is_expected.not_to contain_file('/etc/resolv.conf')
+            is_expected.to contain_exec('restore_resolv.conf_if_possible')
+          }
 
           context 'with manage_resolv_conf false' do
             let(:params) { super().merge(manage_resolv_conf: false) }
 
-            it { is_expected.not_to contain_file('/etc/resolv.conf') }
-            it { is_expected.not_to contain_exec('restore_resolv.conf_if_possible') }
+            it {
+              is_expected.not_to contain_file('/etc/resolv.conf')
+              is_expected.not_to contain_exec('restore_resolv.conf_if_possible')
+            }
           end
 
           context 'with manage_resolv_conf true' do
             let(:params) { super().merge(manage_resolv_conf: true) }
 
-            it { is_expected.not_to contain_file('/etc/resolv.conf') }
-            it { is_expected.to contain_exec('restore_resolv.conf_if_possible') }
+            it {
+              is_expected.not_to contain_file('/etc/resolv.conf')
+              is_expected.to contain_exec('restore_resolv.conf_if_possible')
+            }
           end
         end
 
@@ -140,17 +150,19 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.to contain_ini_setting('dns') }
-          it { is_expected.to contain_ini_setting('fallback_dns') }
-          it { is_expected.not_to contain_ini_setting('domains') }
-          it { is_expected.not_to contain_ini_setting('multicast_dns') }
-          it { is_expected.not_to contain_ini_setting('llmnr') }
-          it { is_expected.not_to contain_ini_setting('dnssec') }
-          it { is_expected.not_to contain_ini_setting('dnsovertls') }
-          it { is_expected.not_to contain_ini_setting('cache') }
-          it { is_expected.not_to contain_ini_setting('dns_stub_listener') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+            is_expected.to contain_ini_setting('dns')
+            is_expected.to contain_ini_setting('fallback_dns')
+            is_expected.not_to contain_ini_setting('domains')
+            is_expected.not_to contain_ini_setting('multicast_dns')
+            is_expected.not_to contain_ini_setting('llmnr')
+            is_expected.not_to contain_ini_setting('dnssec')
+            is_expected.not_to contain_ini_setting('dnsovertls')
+            is_expected.not_to contain_ini_setting('cache')
+            is_expected.not_to contain_ini_setting('dns_stub_listener')
+          }
         end
 
         context 'when enabling resolved with DNS values (array)' do
@@ -162,17 +174,19 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.to contain_ini_setting('dns') }
-          it { is_expected.to contain_ini_setting('fallback_dns') }
-          it { is_expected.not_to contain_ini_setting('domains') }
-          it { is_expected.not_to contain_ini_setting('multicast_dns') }
-          it { is_expected.not_to contain_ini_setting('llmnr') }
-          it { is_expected.not_to contain_ini_setting('dnssec') }
-          it { is_expected.not_to contain_ini_setting('dnsovertls') }
-          it { is_expected.not_to contain_ini_setting('cache') }
-          it { is_expected.not_to contain_ini_setting('dns_stub_listener') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+            is_expected.to contain_ini_setting('dns')
+            is_expected.to contain_ini_setting('fallback_dns')
+            is_expected.not_to contain_ini_setting('domains')
+            is_expected.not_to contain_ini_setting('multicast_dns')
+            is_expected.not_to contain_ini_setting('llmnr')
+            is_expected.not_to contain_ini_setting('dnssec')
+            is_expected.not_to contain_ini_setting('dnsovertls')
+            is_expected.not_to contain_ini_setting('cache')
+            is_expected.not_to contain_ini_setting('dns_stub_listener')
+          }
         end
 
         context 'when setting dns_stub_listener to absent' do
@@ -185,9 +199,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.to contain_ini_setting('dns_stub_listener').with_ensure('absent') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+            is_expected.to contain_ini_setting('dns_stub_listener').with_ensure('absent')
+          }
         end
 
         context 'when setting dns_stub_listener_extra to absent' do
@@ -200,9 +216,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.to contain_ini_setting('dns_stub_listener_extra').with_ensure('absent') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+            is_expected.to contain_ini_setting('dns_stub_listener_extra').with_ensure('absent')
+          }
         end
 
         context 'when enabling resolved with DNS values (full)' do
@@ -222,15 +240,17 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.to contain_ini_setting('dns') }
-          it { is_expected.to contain_ini_setting('fallback_dns') }
-          it { is_expected.to contain_ini_setting('domains') }
-          it { is_expected.to contain_ini_setting('multicast_dns') }
-          it { is_expected.to contain_ini_setting('llmnr') }
-          it { is_expected.to contain_ini_setting('dnssec') }
-          it { is_expected.to contain_ini_setting('dnsovertls') }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+            is_expected.to contain_ini_setting('dns')
+            is_expected.to contain_ini_setting('fallback_dns')
+            is_expected.to contain_ini_setting('domains')
+            is_expected.to contain_ini_setting('multicast_dns')
+            is_expected.to contain_ini_setting('llmnr')
+            is_expected.to contain_ini_setting('dnssec')
+            is_expected.to contain_ini_setting('dnsovertls')
+          }
 
           it {
             expect(subject).to contain_ini_setting('cache').with(
@@ -256,8 +276,10 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
+          it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+          }
 
           it do
             is_expected.to contain_ini_setting('multicast_dns').with(
@@ -296,10 +318,9 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-
           it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
             expect(subject).to contain_ini_setting('cache').with(
               path: '/etc/systemd/resolved.conf',
               value: 'no-negative',
@@ -315,10 +336,10 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-resolved').with_enable(true) }
-
           it {
+            is_expected.to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.to contain_service('systemd-resolved').with_enable(true)
+
             expect(subject).to contain_ini_setting('cache').with(
               path: '/etc/systemd/resolved.conf',
               value: 'no',
@@ -370,8 +391,10 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_exec('systemctl set-default example.target') }
-          it { is_expected.to contain_service('example.target').with_enable(true).with_ensure('running') }
+          it {
+            is_expected.to contain_exec('systemctl set-default example.target')
+            is_expected.to contain_service('example.target').with_enable(true).with_ensure('running')
+          }
         end
 
         context 'when enabling oomd without settings' do
@@ -381,8 +404,10 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-oomd').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-oomd').with_enable(true) }
+          it {
+            is_expected.to contain_service('systemd-oomd').with_ensure('running')
+            is_expected.to contain_service('systemd-oomd').with_enable(true)
+          }
         end
 
         context 'when enabling oomd with settings' do
@@ -397,29 +422,24 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-oomd').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-oomd').with_enable(true) }
-          it { is_expected.to have_ini_setting_resource_count(3) }
-
           it {
+            is_expected.to contain_service('systemd-oomd').with_ensure('running')
+            is_expected.to contain_service('systemd-oomd').with_enable(true)
+            is_expected.to have_ini_setting_resource_count(3)
             expect(subject).to contain_ini_setting('SwapUsedLimit').with(
               path: '/etc/systemd/oomd.conf',
               section: 'OOM',
               notify: 'Service[systemd-oomd]',
               value: '10‰',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('DefaultMemoryPressureLimit').with(
               path: '/etc/systemd/oomd.conf',
               section: 'OOM',
               notify: 'Service[systemd-oomd]',
               value: '10%',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('DefaultMemoryPressureDurationSec').with(
               path: '/etc/systemd/oomd.conf',
               section: 'OOM',
@@ -458,12 +478,14 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_service('systemd-timesyncd').with_ensure('running') }
-          it { is_expected.to contain_service('systemd-timesyncd').with_enable(true) }
-          it { is_expected.not_to contain_service('systemd-resolved').with_ensure('running') }
-          it { is_expected.not_to contain_service('systemd-resolved').with_enable(true) }
-          it { is_expected.not_to contain_service('systemd-networkd').with_ensure('running') }
-          it { is_expected.not_to contain_service('systemd-networkd').with_enable(true) }
+          it {
+            is_expected.to contain_service('systemd-timesyncd').with_ensure('running')
+            is_expected.to contain_service('systemd-timesyncd').with_enable(true)
+            is_expected.not_to contain_service('systemd-resolved').with_ensure('running')
+            is_expected.not_to contain_service('systemd-resolved').with_enable(true)
+            is_expected.not_to contain_service('systemd-networkd').with_ensure('running')
+            is_expected.not_to contain_service('systemd-networkd').with_enable(true)
+          }
 
           if (facts[:os]['name'] == 'Ubuntu' && Puppet::Util::Package.versioncmp(facts[:os]['release']['full'], '20.04') >= 0) || (facts[:os]['name'] == 'Debian')
             it { is_expected.to contain_package('systemd-timesyncd') }
@@ -481,9 +503,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_ini_setting('ntp_server') }
-          it { is_expected.to contain_ini_setting('fallback_ntp_server') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_ini_setting('ntp_server')
+            is_expected.to contain_ini_setting('fallback_ntp_server')
+          }
         end
 
         context 'when enabling timesyncd with NTP values (array)' do
@@ -495,9 +519,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_ini_setting('ntp_server') }
-          it { is_expected.to contain_ini_setting('fallback_ntp_server') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_ini_setting('ntp_server')
+            is_expected.to contain_ini_setting('fallback_ntp_server')
+          }
         end
 
         context 'when setting timezone' do
@@ -507,10 +533,12 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_exec('set system timezone').with_command('timedatectl set-timezone America/Chicago') }
-          it { is_expected.not_to contain_exec('set local hardware clock to local time') }
-          it { is_expected.not_to contain_exec('set local hardware clock to UTC time') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_exec('set system timezone').with_command('timedatectl set-timezone America/Chicago')
+            is_expected.not_to contain_exec('set local hardware clock to local time')
+            is_expected.not_to contain_exec('set local hardware clock to UTC time')
+          }
         end
 
         context 'when setting rtc-local is true' do
@@ -520,9 +548,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_exec('set local hardware clock to local time') }
-          it { is_expected.not_to contain_exec('set local hardware clock to UTC time') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_exec('set local hardware clock to local time')
+            is_expected.not_to contain_exec('set local hardware clock to UTC time')
+          }
         end
 
         context 'when setting rtc-local is false' do
@@ -532,9 +562,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.not_to contain_exec('set local hardware clock to local time') }
-          it { is_expected.to contain_exec('set local hardware clock to UTC time') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.not_to contain_exec('set local hardware clock to local time')
+            is_expected.to contain_exec('set local hardware clock to UTC time')
+          }
         end
 
         context 'when passing service limits' do
@@ -549,8 +581,10 @@ describe 'systemd' do
             Puppet.settings[:strict] = :warning
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_systemd__service_limits('openstack-nova-compute.service').with_limits('LimitNOFILE' => 32_768) }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_systemd__service_limits('openstack-nova-compute.service').with_limits('LimitNOFILE' => 32_768)
+          }
         end
 
         context 'when passing networks' do
@@ -560,12 +594,14 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_systemd__network('uplink.network').with_content('foo') }
-          it { is_expected.to contain_systemd__network('uplink.netdev').with_content('bar') }
-          it { is_expected.to contain_file('/etc/systemd/network/uplink.network') }
-          it { is_expected.to contain_file('/etc/systemd/network/uplink.netdev') }
-          it { is_expected.to have_systemd__network_resource_count(2) }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_systemd__network('uplink.network').with_content('foo')
+            is_expected.to contain_systemd__network('uplink.netdev').with_content('bar')
+            is_expected.to contain_file('/etc/systemd/network/uplink.network')
+            is_expected.to contain_file('/etc/systemd/network/uplink.netdev')
+            is_expected.to have_systemd__network_resource_count(2)
+          }
         end
 
         context 'when passing timers' do
@@ -575,15 +611,17 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_systemd__timer('first.timer').with_timer_content('foo') }
-          it { is_expected.to contain_systemd__timer('second.timer').with_timer_content('bar') }
-          it { is_expected.to contain_systemd__unit_file('first.timer').with_content('foo') }
-          it { is_expected.to contain_systemd__unit_file('second.timer').with_content('bar') }
-          it { is_expected.to contain_file('/etc/systemd/system/first.timer') }
-          it { is_expected.to contain_file('/etc/systemd/system/second.timer') }
-          it { is_expected.to have_systemd__timer_resource_count(2) }
-          it { is_expected.to have_systemd__unit_file_resource_count(2) }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_systemd__timer('first.timer').with_timer_content('foo')
+            is_expected.to contain_systemd__timer('second.timer').with_timer_content('bar')
+            is_expected.to contain_systemd__unit_file('first.timer').with_content('foo')
+            is_expected.to contain_systemd__unit_file('second.timer').with_content('bar')
+            is_expected.to contain_file('/etc/systemd/system/first.timer')
+            is_expected.to contain_file('/etc/systemd/system/second.timer')
+            is_expected.to have_systemd__timer_resource_count(2)
+            is_expected.to have_systemd__unit_file_resource_count(2)
+          }
         end
 
         context 'when passing tmpfiles' do
@@ -593,12 +631,14 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_systemd__tmpfile('first_tmpfile.conf').with_content('foo') }
-          it { is_expected.to contain_systemd__tmpfile('second_tmpfile.conf').with_content('bar') }
-          it { is_expected.to contain_file('/etc/tmpfiles.d/first_tmpfile.conf') }
-          it { is_expected.to contain_file('/etc/tmpfiles.d/second_tmpfile.conf') }
-          it { is_expected.to have_systemd__tmpfile_resource_count(2) }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_systemd__tmpfile('first_tmpfile.conf').with_content('foo')
+            is_expected.to contain_systemd__tmpfile('second_tmpfile.conf').with_content('bar')
+            is_expected.to contain_file('/etc/tmpfiles.d/first_tmpfile.conf')
+            is_expected.to contain_file('/etc/tmpfiles.d/second_tmpfile.conf')
+            is_expected.to have_systemd__tmpfile_resource_count(2)
+          }
         end
 
         context 'when passing unit_files' do
@@ -608,12 +648,14 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_systemd__unit_file('first.service').with_content('foo') }
-          it { is_expected.to contain_systemd__unit_file('second.service').with_content('bar') }
-          it { is_expected.to contain_file('/etc/systemd/system/first.service') }
-          it { is_expected.to contain_file('/etc/systemd/system/second.service') }
-          it { is_expected.to have_systemd__unit_file_resource_count(2) }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_systemd__unit_file('first.service').with_content('foo')
+            is_expected.to contain_systemd__unit_file('second.service').with_content('bar')
+            is_expected.to contain_file('/etc/systemd/system/first.service')
+            is_expected.to contain_file('/etc/systemd/system/second.service')
+            is_expected.to have_systemd__unit_file_resource_count(2)
+          }
         end
 
         context 'when managing Accounting options' do
@@ -650,14 +692,16 @@ describe 'systemd' do
               )
             end
 
-            it { is_expected.to compile.with_all_deps }
-            it { is_expected.to contain_ini_setting('system/DefaultTimeoutStartSec').with_ensure('present').with_value('120s') }
-            # Value is overriden by accounting settings
-            it { is_expected.to contain_ini_setting('system/DefaultCPUAccounting').with_ensure('present').with_value('yes') }
-            # Ensure and value are overriden by accounting settings
-            it { is_expected.to contain_ini_setting('system/DefaultMemoryAccounting').with_ensure('present').with_value('yes') }
-            # Included by accounting (switch to DefaultIOAccounting after RHEL7 EOL)
-            it { is_expected.to contain_ini_setting('system/DefaultBlockIOAccounting').with_ensure('present').with_value('yes') }
+            it {
+              is_expected.to compile.with_all_deps
+              is_expected.to contain_ini_setting('system/DefaultTimeoutStartSec').with_ensure('present').with_value('120s')
+              # Value is overriden by accounting settings
+              is_expected.to contain_ini_setting('system/DefaultCPUAccounting').with_ensure('present').with_value('yes')
+              # Ensure and value are overriden by accounting settings
+              is_expected.to contain_ini_setting('system/DefaultMemoryAccounting').with_ensure('present').with_value('yes')
+              # Included by accounting (switch to DefaultIOAccounting after RHEL7 EOL)
+              is_expected.to contain_ini_setting('system/DefaultBlockIOAccounting').with_ensure('present').with_value('yes')
+            }
           end
         end
 
@@ -673,9 +717,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to have_ini_setting_resource_count(3) }
-          it { is_expected.to contain_ini_setting('system/DefaultMemoryAccounting').with_ensure('absent') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to have_ini_setting_resource_count(3)
+            is_expected.to contain_ini_setting('system/DefaultMemoryAccounting').with_ensure('absent')
+          }
 
           it do
             is_expected.to contain_ini_setting('system/DefaultTimeoutStartSec').with(
@@ -683,9 +729,7 @@ describe 'systemd' do
               path: '/etc/systemd/system.conf',
               value: '120s',
             )
-          end
 
-          it do
             is_expected.to contain_ini_setting('system/DefaultCPUAccounting').with(
               ensure: 'present',
               path: '/etc/systemd/system.conf',
@@ -706,25 +750,22 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to have_ini_setting_resource_count(3) }
-          it { is_expected.to contain_ini_setting('user/DefaultLimitCPU').with_ensure('absent') }
-
-          it do
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to have_ini_setting_resource_count(3)
+            is_expected.to contain_ini_setting('user/DefaultLimitCPU').with_ensure('absent')
             is_expected.to contain_ini_setting('user/DefaultTimeoutStartSec').with(
               ensure: 'present',
               path: '/etc/systemd/user.conf',
               value: '123s',
             )
-          end
 
-          it do
             is_expected.to contain_ini_setting('user/DefaultLimitCORE').with(
               ensure: 'present',
               path: '/etc/systemd/user.conf',
               value: 'infinity',
             )
-          end
+          }
         end
 
         context 'when enabling journald with options' do
@@ -741,35 +782,28 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-
           it {
+            is_expected.to compile.with_all_deps
             expect(subject).to contain_service('systemd-journald').with(
               ensure: 'running',
             )
-          }
 
-          it { is_expected.to have_ini_setting_resource_count(3) }
+            is_expected.to have_ini_setting_resource_count(3)
 
-          it {
             expect(subject).to contain_ini_setting('Storage').with(
               path: '/etc/systemd/journald.conf',
               section: 'Journal',
               notify: 'Service[systemd-journald]',
               value: 'auto',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('MaxRetentionSec').with(
               path: '/etc/systemd/journald.conf',
               section: 'Journal',
               notify: 'Service[systemd-journald]',
               value: '5day',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('MaxLevelStore').with(
               path: '/etc/systemd/journald.conf',
               section: 'Journal',
@@ -786,8 +820,10 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.not_to contain_service('systemd-journald') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.not_to contain_service('systemd-journald')
+          }
         end
 
         context 'when journal-upload and journal-remote is enabled' do
@@ -814,24 +850,20 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-
           it {
+            is_expected.to compile.with_all_deps
+
             is_expected.to contain_service('systemd-journal-upload').with(
               ensure: 'running',
               enable: true,
             )
-          }
 
-          it {
             is_expected.to contain_service('systemd-journal-remote').with(
               ensure: 'running',
             )
-          }
 
-          it { is_expected.to have_ini_setting_resource_count(8) }
+            is_expected.to have_ini_setting_resource_count(8)
 
-          it {
             expect(subject).to contain_ini_setting('journal-upload_TrustedCertificateFile').with(
               path: '/etc/systemd/journal-upload.conf',
               section: 'Upload',
@@ -839,9 +871,7 @@ describe 'systemd' do
               notify: 'Service[systemd-journal-upload]',
               value: '/tmp/cert-upload.pem',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('journal-remote_TrustedCertificateFile').with(
               path: '/etc/systemd/journal-remote.conf',
               section: 'Remote',
@@ -849,9 +879,7 @@ describe 'systemd' do
               notify: 'Service[systemd-journal-remote]',
               ensure: 'absent',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('journal-upload_ServerCertificateFile').with(
               path: '/etc/systemd/journal-upload.conf',
               section: 'Upload',
@@ -859,9 +887,7 @@ describe 'systemd' do
               notify: 'Service[systemd-journal-upload]',
               ensure: 'absent',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('journal-remote_ServerCertificateFile').with(
               path: '/etc/systemd/journal-remote.conf',
               section: 'Remote',
@@ -880,9 +906,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.not_to contain_service('systemd-journal-upload') }
-          it { is_expected.not_to contain_service('systemd-journal-remote') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.not_to contain_service('systemd-journal-upload')
+            is_expected.not_to contain_service('systemd-journal-remote')
+          }
         end
 
         context 'when disabling udevd management' do
@@ -892,10 +920,12 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.not_to contain_service('systemd-udevd') }
-          it { is_expected.not_to contain_file('/etc/udev/udev.conf') }
-          it { is_expected.not_to contain_file('/etc/udev/rules.d') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.not_to contain_service('systemd-udevd')
+            is_expected.not_to contain_file('/etc/udev/udev.conf')
+            is_expected.not_to contain_file('/etc/udev/rules.d')
+          }
         end
 
         context 'when working with udevd and no custom rules' do
@@ -911,15 +941,13 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-
           it {
+            is_expected.to compile.with_all_deps
+
             expect(subject).to contain_service('systemd-udevd')
               .with(enable: true,
                     ensure: 'running')
-          }
 
-          it {
             expect(subject).to contain_file('/etc/udev/udev.conf')
               .with(ensure: 'file',
                     owner: 'root',
@@ -931,9 +959,9 @@ describe 'systemd' do
               .with_content(%r{^event_timeout=3$})
               .with_content(%r{^resolve_names=early$})
               .with_content(%r{^timeout_signal=SIGKILL$})
-          }
 
-          it { is_expected.to contain_file('/etc/udev/rules.d').with_ensure('directory').with_purge(false) }
+            is_expected.to contain_file('/etc/udev/rules.d').with_ensure('directory').with_purge(false)
+          }
         end
 
         context 'when working with udevd and a rule set' do
@@ -967,19 +995,19 @@ describe 'systemd' do
               }
             end
 
-            it { is_expected.to compile.with_all_deps }
-            it { is_expected.to contain_file('/etc/udev/rules.d').with_ensure('directory').with_purge(true) }
+            it {
+              is_expected.to compile.with_all_deps
+              is_expected.to contain_file('/etc/udev/rules.d').with_ensure('directory').with_purge(true)
+            }
           end
 
-          it { is_expected.to compile.with_all_deps }
-
           it {
+            is_expected.to compile.with_all_deps
+
             expect(subject).to contain_service('systemd-udevd')
               .with(enable: true,
                     ensure: 'running')
-          }
 
-          it {
             expect(subject).to contain_file('/etc/udev/udev.conf')
               .with(ensure: 'file',
                     owner: 'root',
@@ -991,19 +1019,17 @@ describe 'systemd' do
               .with_content(%r{^event_timeout=3$})
               .with_content(%r{^resolve_names=early$})
               .with_content(%r{^timeout_signal=SIGKILL$})
-          }
 
-          it {
             expect(subject).to contain_systemd__udev__rule('example_raw.rules')
               .with(rules: [
                       '# I am a comment',
                       'ACTION=="add", KERNEL=="sda", RUN+="/bin/raw /dev/raw/raw1 %N"',
                       'ACTION=="add", KERNEL=="sdb", RUN+="/bin/raw /dev/raw/raw2 %N"',
                     ])
-          }
 
-          it { is_expected.to contain_exec('systemd-udev_reload') }
-          it { is_expected.to contain_file('/etc/udev/rules.d/example_raw.rules').that_notifies('Exec[systemd-udev_reload]') }
+            is_expected.to contain_exec('systemd-udev_reload')
+            is_expected.to contain_file('/etc/udev/rules.d/example_raw.rules').that_notifies('Exec[systemd-udev_reload]')
+          }
         end
 
         context 'with machine-info' do
@@ -1015,8 +1041,10 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_shellvar('PRETTY_HOSTNAME').with(value: 'example hostname') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_shellvar('PRETTY_HOSTNAME').with(value: 'example hostname')
+          }
         end
 
         context 'when enabling logind with options' do
@@ -1038,62 +1066,52 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-
           it {
+            is_expected.to compile.with_all_deps
+
             expect(subject).to contain_service('systemd-logind').with(
               ensure: 'running',
             )
-          }
 
-          it { is_expected.to have_ini_setting_resource_count(5) }
+            is_expected.to have_ini_setting_resource_count(5)
 
-          it {
             expect(subject).to contain_ini_setting('HandleSuspendKey').with(
               path: '/etc/systemd/logind.conf',
               section: 'Login',
               notify: 'Service[systemd-logind]',
               value: 'ignore',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('KillUserProcesses').with(
               path: '/etc/systemd/logind.conf',
               section: 'Login',
               notify: 'Service[systemd-logind]',
               value: 'no',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('KillExcludeUsers').with(
               path: '/etc/systemd/logind.conf',
               section: 'Login',
               notify: 'Service[systemd-logind]',
               value: 'a b',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('RemoveIPC').with(
               path: '/etc/systemd/logind.conf',
               section: 'Login',
               notify: 'Service[systemd-logind]',
               ensure: 'absent',
             )
-          }
 
-          it {
             expect(subject).to contain_ini_setting('UserTasksMax').with(
               path: '/etc/systemd/logind.conf',
               section: 'Login',
               notify: 'Service[systemd-logind]',
               value: '10000',
             )
-          }
 
-          it { is_expected.to contain_loginctl_user('foo').with(linger: 'enabled') }
+            is_expected.to contain_loginctl_user('foo').with(linger: 'enabled')
+          }
         end
 
         context 'when passing dropin_files' do
@@ -1153,9 +1171,7 @@ describe 'systemd' do
             is_expected.to contain_systemd__manage_dropin('foo.conf')
               .with_unit('special.slice')
               .with_slice_entry({ 'CPUQuota' => '999%' })
-          }
 
-          it {
             is_expected.to contain_systemd__manage_dropin('bar.conf')
               .with_unit('special.timer')
               .with_timer_entry({ 'OnCalendar' => ['', 'Daily'] })
@@ -1170,9 +1186,11 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_class('systemd::networkd') }
-          it { is_expected.to contain_file('/etc/systemd/network').with_ensure('directory') }
+          it {
+            is_expected.to compile.with_all_deps
+            is_expected.to contain_class('systemd::networkd')
+            is_expected.to contain_file('/etc/systemd/network').with_ensure('directory')
+          }
         end
 
         context 'when not managing systemd-coredump' do
@@ -1198,12 +1216,12 @@ describe 'systemd' do
             }
           end
 
-          it { is_expected.to contain_class('systemd::coredump') }
-          it { is_expected.to contain_systemd__dropin_file('coredump_backtrace.conf').with_ensure('absent') }
-
-          it { is_expected.to contain_ini_setting('coredump_Storage') }
-
           it {
+            is_expected.to contain_class('systemd::coredump')
+            is_expected.to contain_systemd__dropin_file('coredump_backtrace.conf').with_ensure('absent')
+
+            is_expected.to contain_ini_setting('coredump_Storage')
+
             is_expected.to contain_ini_setting('coredump_Storage').with(
               {
                 path: '/etc/systemd/coredump.conf',
@@ -1212,9 +1230,7 @@ describe 'systemd' do
                 value: 'none',
               },
             )
-          }
 
-          it {
             is_expected.to contain_ini_setting('coredump_ProcessSizeMax').with(
               {
                 path: '/etc/systemd/coredump.conf',
@@ -1223,9 +1239,7 @@ describe 'systemd' do
                 value: '5000E',
               },
             )
-          }
 
-          it {
             is_expected.to contain_ini_setting('coredump_Compress').with(
               {
                 path: '/etc/systemd/coredump.conf',
@@ -1249,8 +1263,10 @@ describe 'systemd' do
               super().merge({ coredump_backtrace: true })
             end
 
-            it { is_expected.to contain_systemd__dropin_file('coredump_backtrace.conf').with_ensure('file') }
-            it { is_expected.to contain_systemd__dropin_file('coredump_backtrace.conf').with_content(%r{^ExecStart=.*--backtrace$}) }
+            it {
+              is_expected.to contain_systemd__dropin_file('coredump_backtrace.conf').with_ensure('file')
+              is_expected.to contain_systemd__dropin_file('coredump_backtrace.conf').with_content(%r{^ExecStart=.*--backtrace$})
+            }
           end
         end
 
